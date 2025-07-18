@@ -1,9 +1,12 @@
-function GalleryTile({position, title}) {
+import { Link } from "react-router-dom";
+
+function GalleryTile({position, title, slug}) {
 
     const alignment = position === 'start'? 'self-start': 'self-end';
 
     return (
-        <div className={`flex flex-col w-[75%] gap-4 ${alignment}`}>
+        <Link to={`/photos/${slug}`} 
+        className={`flex flex-col w-[75%] gap-4 ${alignment}`}>
 
             <h2 className={`text-white text-md rounded-full border border-white px-3 py-2 bg-transparent backdrop-blur-lg w-max ${alignment}`}>{title}</h2>
             <div className="grid grid-cols-3 gap-3">
@@ -13,7 +16,7 @@ function GalleryTile({position, title}) {
             </div>
 
 
-        </div>
+        </Link>
     )
 }
 

@@ -1,8 +1,8 @@
 function Home() {
     return (
-        <div>
+        <section className="pt-20">
             Hello from the Home!
-        </div>
+        </section>
     )
 }
 

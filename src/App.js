@@ -1,23 +1,23 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+import Navbar from "./Components/Navbar";
 import Home from './Pages/Home';
 import About from './Pages/About';
 import Photos from './Pages/Photos';
+import SwiperMain from "./Components/SwiperMain";
 
 function App() {
   return (
     <>
-      <nav className="py-2 bg-green-400">
-        <ul className="list-none flex gap-4 justify-center">
-          <li><Link to='/'>Home</Link></li>
-          <li><Link to='/about'>Home</Link></li>
-          <li><Link to='/photos'>Photos</Link></li>
-        </ul>
-      </nav>
+      <Navbar />
 
+      
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/about" element={<About />}></Route>
         <Route path="/photos" element={<Photos />}></Route>
+
+        {/* Dynamic Routes for Photos */}
+        <Route path="/photos/:slug" element={<SwiperMain />}></Route>
       </Routes>
 
 
