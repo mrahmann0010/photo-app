@@ -5,7 +5,7 @@ function GalleryTile({position, title, slug}) {
     const alignment = position === 'start'? 'self-start': 'self-end';
 
     return (
-        <Link to={`/photos/${slug}`} 
+        <Link to={`/photos/${slug}`}
         className={`flex flex-col w-[75%] gap-4 ${alignment}`}>
 
             <h2 className={`text-white text-md rounded-full border border-white px-3 py-2 bg-transparent backdrop-blur-lg w-max ${alignment}`}>{title}</h2>

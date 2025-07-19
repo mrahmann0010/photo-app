@@ -1,8 +1,11 @@
 import { useParams } from "react-router-dom";
+
+// External Lib
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCards } from 'swiper/modules';
 import "swiper/css";
 import "swiper/css/effect-cards";
+import { motion } from "motion/react";
 
 
 function SwiperMain() {
@@ -27,7 +30,13 @@ function SwiperMain() {
 
     
     return (
-        <section className="py-4 flex flex-col gap-6 items-center">
+        <motion.section
+        initial={{opacity:0, scale:0.85}}
+        animate={{opacity:1, scale:1}}
+        exit={{opacity:0, scale:0.85}}
+        transition={{duration:0.6}}
+        className="py-4 flex flex-col gap-6 items-center">
+        
 
             <div className="flex flex-col items-center">
                 <h3 className="text-xl text-blue-600">{title}</h3>
@@ -47,7 +56,7 @@ function SwiperMain() {
                         </SwiperSlide>
                     ))}
             </Swiper>
-        </section>
+        </motion.section>
     )
 }
 

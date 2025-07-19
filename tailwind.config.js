@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage:{
-        'main-background':"url('/public/12.jpg')",
+        'main-background':"url('/public/10.jpg')",
       },
       colors:{
         'navBG':'rgba(244, 243, 240, 0.8)',
