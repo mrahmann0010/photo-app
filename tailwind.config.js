@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       backgroundImage:{
         'main-background':"url('/public/10.jpg')",
-        'main-background-2':"url('/public/main/hero-bg-3.jpg')",
+        'main-background-2':"linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/public/main/hero-bg-3.jpg')",
         // 'hero-background':"url('/1.jpg')",
       },
       colors:{

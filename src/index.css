@@ -55,3 +55,14 @@
     animation-delay: 0.5s;
   }
 }
+
+
+.bg-white-transparent-text {
+  background: white;
+  color: black;
+  mix-blend-mode: screen;
+  /* Or try difference */
+  padding: 0rem 1rem;
+  border-radius: 9999px; /* rounded-full */
+  font-weight: bold;
+}
