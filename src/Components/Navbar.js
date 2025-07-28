@@ -16,7 +16,7 @@ function Navbar() {
     },[]);
 
     return (
-        <nav className={`my-8 fixed top-0 left-1/2 -translate-x-1/2 ${scrolled? 'bg-navBG px-3 py-4 rounded-full backdrop-blur-[20px] saturate-[1.7] z-50': 'bg-transparent'} transition-all duration-700`}>
+        <nav className={`my-6 fixed top-0 left-1/2 -translate-x-1/2 ${scrolled? 'bg-navBG px-3 py-4 rounded-full backdrop-blur-[20px] saturate-[1.7] z-50': 'bg-transparent'} transition-all duration-700`}>
             <ul className="list-none flex gap-4 justify-center">
             
                 <li>
