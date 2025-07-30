@@ -7,6 +7,7 @@ import Photos from './Pages/Photos';
 // External Lib
 import SwiperMain from "./Components/SwiperMain";
 import { AnimatePresence } from "motion/react";
+import Footer from "./Components/Footer";
 
 function App() {
 
@@ -40,6 +41,8 @@ function App() {
 
         </Route>
       </Routes>
+
+      <Footer />
 
 
     </>
