@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cinematic Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--surface:#0f0f0f;--border:rgba(255,255,255,0.06);
+  --text:#e9e3d8;--muted:#4a4540;--gold:#c8a97e;--gold-dim:rgba(200,169,126,0.12);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+::selection{background:var(--gold-dim);color:var(--gold)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+.serif{font-family:'Cormorant Garamond',Georgia,serif}
+
+/* ── Grain ── */
+body::after{
+  content:'';position:fixed;inset:-200%;width:400%;height:400%;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;opacity:.04;pointer-events:none;z-index:9999;
+  animation:grain 8s steps(2) infinite;
+}
+@keyframes grain{
+  0%{transform:translate(0,0)} 20%{transform:translate(-3%,-4%)}
+  40%{transform:translate(-5%,3%)} 60%{transform:translate(4%,-2%)}
+  80%{transform:translate(2%,4%)} 100%{transform:translate(0,0)}
+}
+
+/* ── Page Header ── */
+.page-header{
+  padding:clamp(70px,10vw,130px) clamp(24px,6vw,80px) clamp(32px,5vw,60px);
+  position:relative;opacity:0;animation:fadeSlideUp .9s ease forwards .1s;
+}
+.header-eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.eyebrow-label{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+.eyebrow-rule{width:40px;height:1px;background:var(--gold);opacity:.4}
+.eyebrow-sub{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.header-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,10vw,10rem);
+  font-weight:300;line-height:.9;letter-spacing:-.04em;color:var(--text);
+  clip-path:inset(0);
+  animation:titleReveal 1.1s cubic-bezier(.22,1,.36,1) forwards .2s;
+  opacity:0;
+}
+@keyframes titleReveal{from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)}}
+.header-desc{
+  font-size:clamp(.85rem,1.2vw,1rem);color:var(--muted);letter-spacing:.05em;
+  max-width:380px;line-height:1.65;margin-top:16px;
+  opacity:0;animation:fadeSlideUp .8s ease forwards .5s;
+}
+.header-rule{
+  position:absolute;bottom:0;
+  left:clamp(24px,6vw,80px);right:clamp(24px,6vw,80px);
+  height:1px;background:var(--border);
+  transform:scaleX(0);transform-origin:left;
+  animation:scaleIn .9s cubic-bezier(.22,1,.36,1) forwards .6s;
+}
+@keyframes scaleIn{to{transform:scaleX(1)}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)}}
+
+/* ── Stats Bar ── */
+.stats-bar{
+  display:flex;
+  margin:0 clamp(24px,6vw,80px);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  opacity:0;animation:fadeSlideUp .7s ease forwards .7s;
+}
+.stat{
+  flex:1;padding:clamp(14px,2vw,22px) clamp(12px,2vw,28px);
+  border-right:1px solid var(--border);
+}
+.stat:last-child{border-right:none}
+.stat-value{
+  display:block;font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.2rem,2.5vw,2rem);font-weight:300;color:var(--text);
+  letter-spacing:-.02em;
+}
+.stat-label{
+  display:block;font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);margin-top:4px;
+}
+
+/* ── Gallery List ── */
+.gallery-list{padding-bottom:clamp(60px,10vw,120px)}
+
+/* ── Gallery Tile ── */
+.tile{
+  padding:clamp(40px,6vw,80px) clamp(24px,6vw,80px);
+  border-top:1px solid var(--border);
+  display:grid;
+  gap:clamp(24px,4vw,60px);
+  align-items:center;
+  position:relative;overflow:hidden;
+  cursor:crosshair;
+  opacity:0;transform:translateY(32px);
+  transition:background .4s ease;
+}
+.tile.even{grid-template-columns:1fr 1.6fr}
+.tile.odd{grid-template-columns:1.6fr 1fr}
+.tile:hover{background:rgba(255,255,255,.012)}
+
+/* Tile appear animation via IntersectionObserver */
+.tile.visible{
+  animation:fadeSlideUp .8s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+/* ── Big BG Number ── */
+.tile-number-bg{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(120px,22vw,300px);font-weight:300;
+  color:rgba(255,255,255,.025);line-height:1;letter-spacing:-.05em;
+  user-select:none;pointer-events:none;white-space:nowrap;
+  transition:color .5s ease;
+}
+.tile:hover .tile-number-bg{color:rgba(200,169,126,.05)}
+
+/* ── Text Side ── */
+.tile-text{display:flex;flex-direction:column;gap:clamp(10px,1.5vw,18px);z-index:1}
+.tile.even .tile-text{order:0}
+.tile.odd .tile-text{order:1}
+
+.tile-meta{display:flex;align-items:center;gap:10px}
+.tile-index{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.tile-meta-rule{width:28px;height:1px;background:var(--gold);opacity:.4}
+.tile-year{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+.tile-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.4rem,5.5vw,5.2rem);
+  font-weight:300;line-height:.95;letter-spacing:-.02em;
+  color:var(--text);transition:color .4s ease;
+}
+.tile:hover .tile-title{color:#fff}
+
+.tile-subtitle{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-weight:300;
+  font-size:clamp(.9rem,1.4vw,1.2rem);color:var(--gold);
+}
+.tile-location{
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+  margin-top:2px;
+}
+
+.tile-cta{display:flex;align-items:center;gap:16px;margin-top:6px}
+.tile-cta-text{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);transition:color .3s ease}
+.tile:hover .tile-cta-text{color:var(--text)}
+.tile-arrow{color:var(--gold);font-size:15px;transition:transform .3s ease}
+.tile:hover .tile-arrow{transform:translateX(5px)}
+.tile-count{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.cta-sep{width:1px;height:13px;background:var(--border)}
+
+/* ── Image Grid ── */
+.tile-images{
+  z-index:1;
+  display:grid;
+  grid-template-rows:1fr 1fr;
+  grid-template-columns:1.6fr 1fr;
+  gap:5px;
+  height:clamp(260px,38vw,520px);
+}
+.tile.even .tile-images{order:1}
+.tile.odd .tile-images{order:0}
+
+.img-wrap{
+  overflow:hidden;border-radius:2px;position:relative;background:#111;
+}
+.img-wrap.hero{grid-row:1/3;grid-column:1}
+.img-wrap.sec{grid-row:1;grid-column:2}
+.img-wrap.ter{grid-row:2;grid-column:2}
+
+.img-wrap img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform 1s cubic-bezier(.22,1,.36,1), filter .5s ease;
+  filter:brightness(.9);
+}
+.tile:hover .img-wrap img{filter:brightness(1)}
+.tile:hover .img-wrap.hero img{transform:scale(1.05)}
+.tile:hover .img-wrap.sec img{transform:scale(1.055);transition-delay:.04s}
+.tile:hover .img-wrap.ter img{transform:scale(1.06);transition-delay:.08s}
+
+/* Hero overlay */
+.img-wrap.hero::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(8,8,8,.6) 0%, transparent 55%);
+  opacity:0;transition:opacity .4s ease;pointer-events:none;
+}
+.tile:hover .img-wrap.hero::after{opacity:1}
+
+/* Explore badge */
+.explore-badge{
+  position:absolute;bottom:14px;left:14px;
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid rgba(200,169,126,.7);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold);font-size:13px;
+  opacity:0;transform:scale(.75);
+  transition:opacity .3s ease, transform .3s cubic-bezier(.22,1,.36,1);
+  z-index:2;
+}
+.tile:hover .explore-badge{opacity:1;transform:scale(1)}
+
+/* ── Hover scanline ── */
+.tile-scanline{
+  position:absolute;bottom:0;left:0;width:100%;height:1px;
+  background:linear-gradient(to right,transparent,var(--gold),transparent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .55s cubic-bezier(.22,1,.36,1);
+  pointer-events:none;
+}
+.tile:hover .tile-scanline{transform:scaleX(1)}
+
+/* ── Footer ── */
+.page-footer{
+  margin:0 clamp(24px,6vw,80px);
+  border-top:1px solid var(--border);
+  padding:clamp(20px,3vw,30px) 0;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-copy{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.footer-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--muted)}
+
+/* ── Responsive ── */
+@media(max-width:700px){
+  .tile.even,.tile.odd{grid-template-columns:1fr!important}
+  .tile.even .tile-text,.tile.odd .tile-text{order:0!important}
+  .tile.even .tile-images,.tile.odd .tile-images{order:1!important}
+  .stats-bar{flex-wrap:wrap}
+  .stat{flex:1 1 50%;border-bottom:1px solid var(--border)}
+  .tile-images{
+    grid-template-columns:1.5fr 1fr!important;
+    height:clamp(200px,55vw,320px)!important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  PAGE HEADER                                                   -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<header class="page-header">
+  <div class="header-eyebrow">
+    <span class="eyebrow-label">Photography</span>
+    <span class="eyebrow-rule"></span>
+    <span class="eyebrow-sub">Selected Works</span>
+  </div>
+  <h1 class="header-title serif">Collections</h1>
+  <p class="header-desc">
+    A curated archive of light, landscape,<br>and lived moments.<br>
+    <span style="color:rgba(74,69,64,.7);font-size:.85em">3 collections · 73 photographs</span>
+  </p>
+  <div class="header-rule"></div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  STATS BAR                                                     -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stat"><span class="stat-value serif">3</span><span class="stat-label">Collections</span></div>
+  <div class="stat"><span class="stat-value serif">73</span><span class="stat-label">Photographs</span></div>
+  <div class="stat"><span class="stat-value serif">3</span><span class="stat-label">Countries</span></div>
+  <div class="stat"><span class="stat-value serif">2019–</span><span class="stat-label">Years Active</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  GALLERY TILES                                                 -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="gallery-list">
+
+  <!-- TILE 01 — EVEN -->
+  <div class="tile even" data-slug="swiss">
+    <div class="tile-number-bg">01</div>
+    <div class="tile-text">
+      <div class="tile-meta">
+        <span class="tile-index">01</span>
+        <span class="tile-meta-rule"></span>
+        <span class="tile-year">2023</span>
+      </div>
+      <h2 class="tile-title serif">Swiss<br>Alps</h2>
+      <div>
+        <div class="tile-subtitle serif">Mountain Light</div>
+        <div class="tile-location">Switzerland · Alps</div>
+      </div>
+      <div class="tile-cta">
+        <span class="tile-cta-text">View Collection</span>
+        <span class="tile-arrow">→</span>
+        <span class="cta-sep"></span>
+        <span class="tile-count">24 photos</span>
+      </div>
+    </div>
+    <div class="tile-images">
+      <div class="img-wrap hero">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=85" alt="Swiss Alps hero" loading="lazy"/>
+        <span class="explore-badge">↗</span>
+      </div>
+      <div class="img-wrap sec">
+        <img src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80" alt="" loading="lazy"/>
+      </div>
+      <div class="img-wrap ter">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=80" alt="" loading="lazy"/>
+      </div>
+    </div>
+    <div class="tile-scanline"></div>
+  </div>
+
+  <!-- TILE 02 — ODD -->
+  <div class="tile odd" data-slug="forest">
+    <div class="tile-number-bg">02</div>
+    <div class="tile-text">
+      <div class="tile-meta">
+        <span class="tile-index">02</span>
+        <span class="tile-meta-rule"></span>
+        <span class="tile-year">2023</span>
+      </div>
+      <h2 class="tile-title serif">Dark<br>Forest</h2>
+      <div>
+        <div class="tile-subtitle serif">Shadows &amp; Light</div>
+        <div class="tile-location">Black Forest · Germany</div>
+      </div>
+      <div class="tile-cta">
+        <span class="tile-cta-text">View Collection</span>
+        <span class="tile-arrow">→</span>
+        <span class="cta-sep"></span>
+        <span class="tile-count">18 photos</span>
+      </div>
+    </div>
+    <div class="tile-images">
+      <div class="img-wrap hero">
+        <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=85" alt="Dark Forest hero" loading="lazy"/>
+        <span class="explore-badge">↗</span>
+      </div>
+      <div class="img-wrap sec">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&q=80" alt="" loading="lazy"/>
+      </div>
+      <div class="img-wrap ter">
+        <img src="https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=500&q=80" alt="" loading="lazy"/>
+      </div>
+    </div>
+    <div class="tile-scanline"></div>
+  </div>
+
+  <!-- TILE 03 — EVEN -->
+  <div class="tile even" data-slug="tropics">
+    <div class="tile-number-bg">03</div>
+    <div class="tile-text">
+      <div class="tile-meta">
+        <span class="tile-index">03</span>
+        <span class="tile-meta-rule"></span>
+        <span class="tile-year">2022</span>
+      </div>
+      <h2 class="tile-title serif">Tropics</h2>
+      <div>
+        <div class="tile-subtitle serif">Equatorial Study</div>
+        <div class="tile-location">Costa Rica · Jungle</div>
+      </div>
+      <div class="tile-cta">
+        <span class="tile-cta-text">View Collection</span>
+        <span class="tile-arrow">→</span>
+        <span class="cta-sep"></span>
+        <span class="tile-count">31 photos</span>
+      </div>
+    </div>
+    <div class="tile-images">
+      <div class="img-wrap hero">
+        <img src="https://images.unsplash.com/photo-1503785640985-f62e3aeee448?w=900&q=85" alt="Tropics hero" loading="lazy"/>
+        <span class="explore-badge">↗</span>
+      </div>
+      <div class="img-wrap sec">
+        <img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500&q=80" alt="" loading="lazy"/>
+      </div>
+      <div class="img-wrap ter">
+        <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=500&q=80" alt="" loading="lazy"/>
+      </div>
+    </div>
+    <div class="tile-scanline"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                        -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<footer class="page-footer">
+  <span class="footer-copy">© 2024 Portfolio</span>
+  <span class="footer-tag serif">Light &amp; Shadow</span>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  SCROLL REVEAL + PARALLAX JS                                   -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<script>
+// ── Scroll-triggered tile reveal ───────────────────────────────
+const tiles = document.querySelectorAll('.tile');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      // Slight delay stagger per tile index
+      const idx = Array.from(tiles).indexOf(entry.target);
+      entry.target.style.animationDelay = `${idx * 0.05}s`;
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+
+tiles.forEach(tile => observer.observe(tile));
+
+// ── Mouse parallax on tile hero image ─────────────────────────
+tiles.forEach(tile => {
+  const hero = tile.querySelector('.img-wrap.hero img');
+  if (!hero) return;
+
+  let raf;
+  let targetX = 0, targetY = 0;
+  let currentX = 0, currentY = 0;
+
+  tile.addEventListener('mousemove', (e) => {
+    const rect = tile.getBoundingClientRect();
+    targetX = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+    targetY = ((e.clientY - rect.top) / rect.height - 0.5) * 5;
+  });
+
+  tile.addEventListener('mouseleave', () => {
+    targetX = 0; targetY = 0;
+  });
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function animate() {
+    currentX = lerp(currentX, targetX, 0.07);
+    currentY = lerp(currentY, targetY, 0.07);
+    hero.style.transform = `scale(1.08) translate(${currentX}px, ${currentY}px)`;
+    raf = requestAnimationFrame(animate);
+  }
+
+  tile.addEventListener('mouseenter', () => {
+    cancelAnimationFrame(raf);
+    animate();
+  });
+  tile.addEventListener('mouseleave', () => {
+    // Smooth return
+    function returnToCenter() {
+      currentX = lerp(currentX, 0, 0.1);
+      currentY = lerp(currentY, 0, 0.1);
+      hero.style.transform = `scale(1) translate(${currentX}px, ${currentY}px)`;
+      if (Math.abs(currentX) > 0.01 || Math.abs(currentY) > 0.01) {
+        raf = requestAnimationFrame(returnToCenter);
+      } else {
+        hero.style.transform = '';
+        cancelAnimationFrame(raf);
+      }
+    }
+    cancelAnimationFrame(raf);
+    returnToCenter();
+  });
+});
+
+// ── Click to navigate ─────────────────────────────────────────
+tiles.forEach(tile => {
+  tile.addEventListener('click', () => {
+    const slug = tile.dataset.slug;
+    // Replace with: window.location.href = `/photos/${slug}`;
+    console.log('Navigate to:', `/photos/${slug}`);
+    // Visual flash feedback
+    tile.style.transition = 'opacity .2s';
+    tile.style.opacity = '0.7';
+    setTimeout(() => { tile.style.opacity = ''; }, 200);
+  });
+});
+</script>
+</body>
+</html>

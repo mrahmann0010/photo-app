@@ -1,0 +1,23 @@
+/* ── Self-hosted fonts placeholder ──────────────────────────
+   Fonts are currently loaded via Google Fonts in index.html.
+   Replace these @font-face rules with actual .woff2 files when
+   switching to self-hosted fonts for performance.
+────────────────────────────────────────────────────────────── */
+
+/*
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Canela';
+  src: url('/fonts/Canela-Variable.woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
