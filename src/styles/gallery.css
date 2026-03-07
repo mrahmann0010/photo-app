@@ -1,0 +1,537 @@
+/* Styles extracted from gallery.html
+   Converted from inline <style> block to standalone CSS.
+   The classes here are used by GalleryPage to replicate the static
+   gallery/detail UI seen in the provided HTML sample. */
+
+/* root color variables used only by gallery components */
+:root {
+  --sky0: #8dbdd4;
+  --sky1: #a8cedf;
+  --sky2: #bcd9e8;
+  --sky3: #cce2ef;
+  --chip: rgba(255, 255, 255, 0.64);
+  --chip2: rgba(210, 228, 238, 0.82);
+  --card-r: 20px;
+  --detail-bg: #f0ede8;
+  --text: #18181c;
+  --muted: rgba(0, 0, 0, 0.4);
+  --red: #e5473d;
+  --shadow: 0 4px 22px rgba(0, 0, 0, 0.18);
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.13);
+}
+
+/* ─────────────────────────────── GALLERY VIEW ─── */
+#galleryView {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition:
+    opacity 0.38s ease,
+    transform 0.38s ease;
+  z-index: 1;
+}
+#galleryView.bg {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 52px 22px 10px;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+  background: #ccc;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.chip {
+  background: var(--chip);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border-radius: 24px;
+  padding: 5px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.015em;
+}
+
+.icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--chip);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+.icon-circle:active {
+  transform: scale(0.86);
+}
+
+/* Gallery scroll */
+#galleryScroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 0 120px;
+  -webkit-overflow-scrolling: touch;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: top center;
+}
+#galleryScroll::-webkit-scrollbar {
+  display: none;
+}
+#galleryScroll.z-out {
+  transform: scale(0.7);
+}
+#galleryScroll.z-in {
+  transform: scale(1.32);
+}
+
+/* Collection row */
+.c-row {
+  display: flex;
+  flex-direction: column;
+  margin: 14px 0;
+  padding: 0 26px;
+  gap: 0;
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+  opacity: 0;
+  animation: rowIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.c-row.left {
+  align-items: flex-start;
+}
+.c-row.right {
+  align-items: flex-end;
+}
+.c-row:nth-child(1) {
+  animation-delay: 0.08s;
+}
+.c-row:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.c-row:nth-child(3) {
+  animation-delay: 0.26s;
+}
+.c-row:nth-child(4) {
+  animation-delay: 0.34s;
+}
+.c-row:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.c-row.dim {
+  opacity: 0.18;
+  transform: scale(0.94);
+}
+
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.c-label {
+  background: var(--chip);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border-radius: 22px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+}
+
+.c-count {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 7px;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Card Cluster ─── */
+.cluster {
+  position: relative;
+  width: 214px;
+  height: 196px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s ease;
+}
+.cluster:active {
+  transform: scale(0.93) !important;
+}
+
+/* Hover — fan cards apart */
+.cluster:hover .c-card.k1 {
+  transform: rotate(-14deg) translate(-9px, 7px);
+}
+.cluster:hover .c-card.k2 {
+  transform: rotate(-5deg) translate(-4px, 1px);
+}
+.cluster:hover .c-card.k3 {
+  transform: rotate(7deg) translate(5px, -3px);
+}
+
+.c-card {
+  position: absolute;
+  border-radius: var(--card-r);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(180, 200, 210, 0.6);
+}
+.c-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* card layout inside cluster */
+.c-card.k1 {
+  width: 108px;
+  height: 116px;
+  top: 28px;
+  left: 2px;
+  transform: rotate(-11deg);
+  z-index: 1;
+}
+.c-card.k2 {
+  width: 116px;
+  height: 122px;
+  top: 12px;
+  left: 28px;
+  transform: rotate(-3.5deg);
+  z-index: 2;
+}
+.c-card.k3 {
+  width: 142px;
+  height: 158px;
+  top: 0;
+  left: 58px;
+  transform: rotate(5deg);
+  z-index: 3;
+}
+
+/* ─── Search / Bottom Bar ─── */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 16px 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(
+    to top,
+    rgba(120, 172, 200, 0.7) 0%,
+    transparent 100%
+  );
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 20;
+}
+.search-wrap {
+  flex: 1;
+  background: var(--chip2);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-radius: 30px;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+.search-wrap svg {
+  color: rgba(0, 0, 0, 0.38);
+  flex-shrink: 0;
+}
+.search-wrap input {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+  letter-spacing: -0.01em;
+}
+.search-wrap input::placeholder {
+  color: rgba(0, 0, 0, 0.36);
+}
+
+.bar-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--chip2);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
+  color: #2a2a30;
+  flex-shrink: 0;
+  transition:
+    transform 0.15s ease,
+    background 0.15s;
+}
+.bar-btn:active {
+  transform: scale(0.88);
+  background: rgba(180, 208, 222, 0.9);
+}
+
+/* ─────────────────────────── DETAIL VIEW ─── */
+#detailView {
+  position: fixed;
+  inset: 0;
+  background: var(--detail-bg);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(102%);
+  transition: transform 0.56s cubic-bezier(0.32, 0.72, 0, 1);
+  border-radius: 28px 28px 0 0;
+  overflow: hidden;
+  will-change: transform;
+}
+#detailView.open {
+  transform: translateY(0);
+  transition: transform 0.52s cubic-bezier(0.32, 0.72, 0, 1);
+}
+/* small pill handle at top of sheet */
+.handle {
+  width: 38px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 3px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 22px 10px;
+  position: relative;
+  flex-shrink: 0;
+}
+.back-btn {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.07);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a2a2a;
+  transition:
+    background 0.14s,
+    transform 0.14s;
+}
+.back-btn:active {
+  background: rgba(0, 0, 0, 0.13);
+  transform: translateY(-50%) scale(0.88);
+}
+
+.detail-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.03em;
+}
+.detail-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Carousel ─── */
+.carousel-outer {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  min-height: 0;
+  position: relative;
+}
+.carousel-outer:active {
+  cursor: grabbing;
+}
+
+#carouselTrack {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.photo-card {
+  flex-shrink: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 8px 36px rgba(0, 0, 0, 0.14);
+  transition:
+    transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.44s ease,
+    box-shadow 0.44s ease;
+  background: #bbb;
+}
+.photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  draggable: false;
+}
+.photo-card.side {
+  transform: scale(0.86);
+  opacity: 0.52;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Scrubber ─── */
+.scrubber-wrap {
+  padding: 6px 26px 0;
+  flex-shrink: 0;
+}
+.scrubber-inner {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 2.5px;
+  cursor: pointer;
+}
+.s-tick {
+  flex: 1;
+  height: 6.5px;
+  background: rgba(0, 0, 0, 0.13);
+  border-radius: 2px;
+  transition:
+    height 0.2s ease,
+    background 0.2s ease;
+}
+.s-tick.on {
+  height: 14px;
+  background: rgba(0, 0, 0, 0.46);
+}
+
+/* Location */
+.loc-row {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px 0 10px;
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 0 20px 40px;
+  flex-shrink: 0;
+}
+.act-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.065);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a2a30;
+  transition:
+    background 0.15s,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.act-btn:active {
+  background: rgba(0, 0, 0, 0.12);
+  transform: scale(0.88);
+}
+.act-btn.liked svg {
+  fill: var(--red);
+  stroke: var(--red);
+}
+
+/* ─── Zoom cursor flash ─── */
+.bar-btn.flashed {
+  animation: btnFlash 0.3s ease;
+}
+@keyframes btnFlash {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.82);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
