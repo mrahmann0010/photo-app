@@ -83,5 +83,3 @@ const photos = [
   "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
   "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
 ];
-
-// Gallery needs to be reshaped in the following ways -
