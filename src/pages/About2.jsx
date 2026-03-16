@@ -180,6 +180,7 @@ function PhotoMesh({ url, x, y, scale, aspect }) {
     // Amplify curveIntensity with a bounded boost so we can tune distortion
     // without changing the physics. clamp to a reasonable ceiling (1.6)
     const boost = Math.min(ci * CURVE_BOOST, 1.6);
+    matRef.current.uniforms.uCurve.value = boost * 0.6;
 
     // Targets driven by boosted curveIntensity (0 when still → everything zero → flat)
     const tRotY = -nX * para * boost * MAX_ROT_DEG;
@@ -205,8 +206,37 @@ function PhotoMesh({ url, x, y, scale, aspect }) {
 
   return (
     <mesh ref={meshRef} position={[x, y, 0]}>
-      <planeGeometry args={[scale * aspect, scale]} />
-      <meshBasicMaterial ref={matRef} map={texture} toneMapped={false} />
+      <planeGeometry args={[scale * aspect, scale, 40, 1]} />
+      <shaderMaterial
+        ref={matRef}
+        uniforms={{
+          uTexture: { value: texture },
+          uCurve: { value: 0 },
+        }}
+        vertexShader={`
+    uniform float uCurve;
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+
+      vec3 pos = position;
+
+      float bend = pos.x * pos.x * uCurve;
+      pos.z -= bend;
+
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+    }
+  `}
+        fragmentShader={`
+    uniform sampler2D uTexture;
+    varying vec2 vUv;
+
+    void main(){
+      gl_FragColor = texture2D(uTexture, vUv);
+    }
+  `}
+      />
     </mesh>
   );
 }
