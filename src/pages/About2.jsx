@@ -1,15 +1,9 @@
 /**
- * CylindricalGallery.jsx — v5
+ * CylindricalGallery.jsx — v5 (adjusted)
  *
- * Core fix: separate curveIntensity signal
- * ─────────────────────────────────────────
- * velocity  — world-unit scroll speed, small numbers (~0.1–0.5)
- * speed     — |velocity| normalised to 0–1, capped so it saturates naturally
- * curveIntensity — smoothed version of speed; ramps up while scrolling,
- *                  springs back to 0 when motion stops.
- *
- * The distortion math uses curveIntensity (0–1) so the max rotation
- * and depth values are fully predictable regardless of sensitivity tuning.
+ * Core fix: separate curveIntensity signal and boost it for stronger distortion
+ * during scroll. Only the distortion multiplier was changed; physics remain
+ * untouched.
  */
 
 import {
@@ -153,6 +147,11 @@ const MAX_ROT_DEG = 12; // max Y-rotation at screen edges (degrees)
 const MAX_TZ = -1.4; // max Z recession at edges (world units)
 const MAX_DIM = 0.22; // max brightness reduction at edges (0–1)
 
+// NEW: amplify the curveIntensity when calculating targets
+// Increase this to make the distortion stronger during scroll.
+// Suggested: 1.4–2.2 for progressively stronger effects.
+const CURVE_BOOST = 1.7;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PhotoMesh
 // ─────────────────────────────────────────────────────────────────────────────
@@ -178,17 +177,20 @@ function PhotoMesh({ url, x, y, scale, aspect }) {
     const nX = x / 5.0;
     const para = nX * nX;
 
-    // Targets driven by curveIntensity (0 when still → everything zero → flat)
-    const tRotY = -nX * para * ci * MAX_ROT_DEG;
-    const tZ = para * ci * MAX_TZ;
-    const tBri = 1 - para * ci * MAX_DIM;
+    // Amplify curveIntensity with a bounded boost so we can tune distortion
+    // without changing the physics. clamp to a reasonable ceiling (1.6)
+    const boost = Math.min(ci * CURVE_BOOST, 1.6);
+
+    // Targets driven by boosted curveIntensity (0 when still → everything zero → flat)
+    const tRotY = -nX * para * boost * MAX_ROT_DEG;
+    const tZ = para * boost * MAX_TZ;
+    const tBri = 1 - para * boost * MAX_DIM;
 
     // Fast ramp-up, gentle release — asymmetric spring for realism
     const kIn = 1 - Math.pow(0.001, delta * 10); // snappy follow
     const kOut = 1 - Math.pow(0.001, delta * 5); // slower unwind
 
-    const kRot = ci > D.current.rotY / MAX_ROT_DEG ? kIn : kOut;
-
+    // keep simple: use kIn for rot & tz, kOut for brightness unwind
     D.current.rotY = THREE.MathUtils.lerp(D.current.rotY, tRotY, kIn);
     D.current.tz = THREE.MathUtils.lerp(D.current.tz, tZ, kIn);
     D.current.bri = THREE.MathUtils.lerp(D.current.bri, tBri, kOut);
