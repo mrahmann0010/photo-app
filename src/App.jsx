@@ -1,8 +1,7 @@
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./Components/Navbar";
-import Home from "./Pages/Home";
 // import About from "./Pages/About";
-import CurvedGallery from "./pages/About2";
+import CurvedGallery from "./pages/Landing";
 import GalleryPage from "./pages/GalleryPage";
 
 // External Lib
@@ -18,8 +17,7 @@ function App() {
       <Navbar />
 
       <Routes location={location}>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/about" element={<CurvedGallery />}></Route>
+        <Route path="/" element={<CurvedGallery />}></Route>
 
         {/* For Framer Motion, Wrapper */}
 
